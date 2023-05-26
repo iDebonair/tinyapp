@@ -75,3 +75,8 @@ app.post("/u/:id", (req, res) => {
   console.log(req.body.longURL);
   res.send("URL saved");
 });
+
+app.post("/urls/:id/delete", (req, res) => {
+  const id = req.params.id;
+  delete urlDatabase[id];
+})
