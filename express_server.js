@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const app = express();
 const PORT = 8080;
 app.set("view engine", "ejs"); 
@@ -14,13 +15,15 @@ function generateRandomString(length) {
 }
 
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.post('/urls', (req, res) => {
   const longURL = req.body.longURL;
   const id = generateRandomString(6);
   
   urlDatabase[id] = longURL;
-  res.status(201).send('URL successfully saved!');
+  // res.status(201).send('URL successfully saved!');
+  res.redirect("/urls") 
 });
 
 const urlDatabase = {
@@ -46,12 +49,12 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { urls: urlDatabase, username: req.cookies.username };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  res.render("urls_new",{username: req.cookies.username});
 });
 
 
@@ -80,7 +83,7 @@ app.post("/u/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   delete urlDatabase[id];
-  res.redirect("urls");
+  res.redirect("/urls");
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -93,4 +96,10 @@ app.post("/urls/:id/edit", (req, res) => {
   const newURL = req.body.updatedLongURL;
   urlDatabase[id] = newURL;
   res.redirect("/urls"); // Redirect to the index page after editing the URL
+});
+
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie("username", username);
+  res.redirect("/urls");
 });
