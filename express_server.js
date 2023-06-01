@@ -215,11 +215,12 @@
     
 
     app.post("/login", (req, res) => {
+      const bcrypt = require("bcryptjs");
       const email = req.body.email;
       const password = req.body.password;
       const user = getUserByEmail(email);
-
-    if (user && user.password === password) {
+      
+    if (user && bcrypt.compareSync(password, user.password)) {
       res.cookie("user_id", user.id);
       res.redirect("/urls");
     } else {
@@ -241,13 +242,16 @@
     });
 
     app.post("/register", (req, res) => {
+      const bcrypt = require ("bcryptjs");
       const { email, password } = req.body;
+      const hashedPassword = bcrypt.hashSync(password, 10);         
+
       const id = generateRandomString(6);
       
       if(getUserByEmail(email)) {
           res.status(400).end(`${email} is already registered`);
         } else { 
-          users[id] = { id, email, password };
+          users[id] = { id, email, password:hashedPassword };
           res.cookie("user_id", id);
           res.redirect("/urls");
         }
