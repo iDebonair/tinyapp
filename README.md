@@ -1,10 +1,13 @@
 # TinyApp Project
 
-TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs. With this web app, you have a personalised profile accessible to you after registering.
+TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs. Users of the web application have to register before they are able to use the web app.
 
 ## Final Product
 image.png
-image.png
+
+!["screenshot of urls page with no short url created"](https://github.com/iDebonair/tinyapp/blob/main/docs/Screenshot%202023-06-02%20at%207.38.59%20PM.png)
+!["screenshot of urls page with three short urls created"](https://github.com/iDebonair/tinyapp/blob/main/docs/Screenshot%202023-06-02%20at%207.50.15%20PM.png)
+!["screenshot of the edit feature"](https://github.com/iDebonair/tinyapp/blob/main/docs/Screenshot%202023-06-02%20at%207.49.57%20PM.png)
 
 ## Dependencies
 
@@ -13,7 +16,6 @@ image.png
 - EJS
 - bcryptjs
 - cookie-session
-- nodemom
 
 ## Getting Started
 
