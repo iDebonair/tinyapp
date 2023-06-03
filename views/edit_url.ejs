@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit URL</title>
+</head>
+<body>
+  <h1>Edit URL</h1>
+  <form method="POST" action="/urls/<%= id %>/edit">
+    <input type="text" name="updatedLongURL" value="<%= longURL %>">
+    <button type="submit">Update URL</button>
+  </form>
+</body>
+</html>
