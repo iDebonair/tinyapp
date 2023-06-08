@@ -1,21 +1,10 @@
+const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
-const { getUserByEmail } = require("./helpers");
+const { getUserByEmail, users } = require("./helpers");
 const express = require("express");
 const app = express();
 const PORT = 8080;
 app.set("view engine", "ejs");
-const users = {
-  user1RandomID:{
-    id: "user1RandomID",
-    email: "example@gmail.com",
-    Password: "purple-monkey-dinosaur",
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
-  }
-};
 
 function generateRandomString(length) {
   const alphanumericChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -69,20 +58,12 @@ function urlsForUser(id) {
 }
     
 app.get("/", (req, res) => {
-  res.send("Hello");
-});
-
-app.listen(PORT, () => {
-  console.log(`Example app listening on ${PORT}`);
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body><html/>\n");
-});
+  if (req.session.user_id) {
+    res.redirect("urls");
+  } else {
+    res.redirect("login");
+  }
+  });
 
 app.get("/urls", (req, res) => {
   const userId = req.session.user_id;
@@ -110,31 +91,13 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id].longURL;
-  if (longURL) {
-    res.redirect(longURL);
+  const url = urlDatabase[id];
+  if (url && url.longURL) {
+    console.log ("longURL", url.longURL)
+    res.redirect(url.longURL);
   } else {
     res.status(404).send('URL not found');
   }
-});
-
-app.post("/urls", (req, res) => {
-  if (!req.session.user_id) {
-    res.redirect("/login");
-  } else {
-    const longURL = req.body.longURL;
-    const id =  generateRandomString(6);
-    urlDatabase[id] = {
-      longURL: longURL,
-      userID: req.session.user_id
-    };
-    res.redirect(`/urls/${id}`);
-  }
-});
-
-app.post("/u/:id", (req, res) => {
-  console.log(req.body.longURL);
-  res.send("URL saved");
 });
 
 app.post("/urls/:id/delete", (req, res) => {
@@ -150,6 +113,20 @@ app.post("/urls/:id/delete", (req, res) => {
   } else {
     delete urlDatabase[id];
     res.redirect("/urls");
+  }
+});
+
+app.post("/urls", (req, res) => {
+  if (!req.session.user_id) {
+    res.redirect("/login");
+  } else {
+    const longURL = req.body.longURL;
+    const id =  generateRandomString(6);
+    urlDatabase[id] = {
+      longURL: longURL,
+      userID: req.session.user_id
+    };
+    res.redirect(`/urls/${id}`);
   }
 });
 
@@ -189,28 +166,27 @@ app.post("/urls/:id/edit", (req, res) => {
   }
 });
 
-app.get("/urls/:id/edit", (req, res) => {
-  const id = req.params.id;
-  const url = urlDatabase[id];
-  const userId = req.session.user_id;
+// app.get("/urls/:id/edit", (req, res) => {
+//   const id = req.params.id;
+//   const url = urlDatabase[id];
+//   const userId = req.session.user_id;
     
-  if (!url) {
-    res.status(404).end("URL not found");
-  } else if (url.userID !== userId) {
-    res.status(403).end("You do not have permission to edit this URL");
-  } else {
-    const templateVars = {
-      id: id,
-      longURL: url.longURL,
-      user: users[userId]
-    };
-    res.render("edit_url", templateVars);
-  }
-});
+//   if (!url) {
+//     res.status(404).end("URL not found");
+//   } else if (url.userID !== userId) {
+//     res.status(403).end("You do not have permission to edit this URL");
+//   } else {
+//     const templateVars = {
+//       id: id,
+//       longURL: url.longURL,
+//       user: users[userId]
+//     };
+//     res.render("edit_url", templateVars);
+//   }
+// });
     
 
 app.post("/login", (req, res) => {
-  const bcrypt = require("bcryptjs");
   const email = req.body.email;
   const password = req.body.password;
   const user = getUserByEmail(email, users);
@@ -238,7 +214,6 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  const bcrypt = require("bcryptjs");
   const { email, password } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 10);
 
@@ -259,4 +234,7 @@ app.get("/register", (req, res) => {
   } else {
     res.render("register");
   }
+});
+app.listen(PORT, () => {
+  console.log(`Example app listening on ${PORT}`);
 });

@@ -6,6 +6,19 @@ function getUserByEmail(email, users) {
     }
   }
   return null;
-}
+};
 
-module.exports = { getUserByEmail };
+const users = {
+  user1RandomID:{
+    id: "user1RandomID",
+    email: "example@gmail.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+};
+
+module.exports = { getUserByEmail, users };
