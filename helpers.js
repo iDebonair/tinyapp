@@ -8,17 +8,14 @@ function getUserByEmail(email, users) {
   return null;
 };
 
-const users = {
-  user1RandomID:{
-    id: "user1RandomID",
-    email: "example@gmail.com",
-    password: "purple-monkey-dinosaur",
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
+function generateRandomString(length) {
+  const alphanumericChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let id = '';
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * alphanumericChars.length);
+    id += alphanumericChars[randomIndex];
   }
+  return id;
 };
 
-module.exports = { getUserByEmail, users };
+module.exports = { getUserByEmail, generateRandomString };

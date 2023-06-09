@@ -1,20 +1,13 @@
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
-const { getUserByEmail, users } = require("./helpers");
+const { getUserByEmail, generateRandomString } = require("./helpers");
+const { urlDatabase, users } = require("./databases")
 const express = require("express");
 const app = express();
 const PORT = 8080;
 app.set("view engine", "ejs");
 
-function generateRandomString(length) {
-  const alphanumericChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let id = '';
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * alphanumericChars.length);
-    id += alphanumericChars[randomIndex];
-  }
-  return id;
-}
+
 app.use(cookieSession({
   name: 'session',
   keys: ["Test"],
@@ -35,17 +28,6 @@ app.post('/urls', (req, res) => {
   res.redirect("/urls");
 });
 
-const urlDatabase = {
-  "b2xVn2": {
-    longURL: "http://www.lighthouselabs.ca",
-    userID: "aJ48lW",
-  },
-
-  "9sm5xK": {
-    longURL:  "http://www.google.com",
-    userID: "aJ48lW",
-  }
-};
 function urlsForUser(id) {
   const userURLs = {};
   for (const shortURL in urlDatabase) {
@@ -164,27 +146,7 @@ app.post("/urls/:id/edit", (req, res) => {
     urlDatabase[id].longURL = newURL;
     res.redirect("/urls");
   }
-});
-
-// app.get("/urls/:id/edit", (req, res) => {
-//   const id = req.params.id;
-//   const url = urlDatabase[id];
-//   const userId = req.session.user_id;
-    
-//   if (!url) {
-//     res.status(404).end("URL not found");
-//   } else if (url.userID !== userId) {
-//     res.status(403).end("You do not have permission to edit this URL");
-//   } else {
-//     const templateVars = {
-//       id: id,
-//       longURL: url.longURL,
-//       user: users[userId]
-//     };
-//     res.render("edit_url", templateVars);
-//   }
-// });
-    
+});    
 
 app.post("/login", (req, res) => {
   const email = req.body.email;
@@ -209,9 +171,10 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  delete req.session.user_id;
+  req.session = null;
   res.redirect("/login");
 });
+
 
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
