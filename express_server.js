@@ -16,18 +16,6 @@ app.use(cookieSession({
 
 app.use(express.urlencoded({ extended: true }));
 
-app.post('/urls', (req, res) => {
-  const longURL = req.body.longURL;
-  const id = generateRandomString(6);
-      
-  const newURL = {
-    longURL: longURL,
-    userID: req.session.user_id,
-  };
-  urlDatabase[id] = newURL;
-  res.redirect("/urls");
-});
-
 function urlsForUser(id) {
   const userURLs = {};
   for (const shortURL in urlDatabase) {
